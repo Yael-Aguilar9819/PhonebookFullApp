@@ -29,6 +29,18 @@ app.get("/api/persons", (request, response) => {
     response.send(persons);
 });
 
+const getActualHourWithDate = () => {
+    const actualDate = new Date().toDateString();
+    const actualHour = new Date().toTimeString();
+    return `${actualDate} ${actualHour}`;
+};
+
+app.get("/info", (request, response) => {
+    const description = `<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`;
+
+    response.send(description);
+})
+
 
 const PORT = 3001
 app.listen(PORT, () => {
