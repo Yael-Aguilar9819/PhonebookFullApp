@@ -29,6 +29,20 @@ app.get("/api/persons", (request, response) => {
     response.send(persons);
 });
 
+//This is the view for the each id
+app.get("/api/persons/:id", (request, response) => {
+  //It saves resources because otherwise, it would be casted as a number again and again
+  const id = Number(request.params.id);
+  const person = persons.find(person => person.id === id);
+  
+  if (person) {
+    response.send(person);        
+  }
+  //if its not and object/positive variable, its not going to be true, then it returns the good ol not found
+  response.status(404).end();
+});
+
+
 const getActualHourWithDate = () => {
     const actualDate = new Date().toDateString();
     const actualHour = new Date().toTimeString();
