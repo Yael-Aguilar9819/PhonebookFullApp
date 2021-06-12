@@ -53,10 +53,15 @@ app.post("/api/persons", (request, response) => {
   //This give us a random place from 1 to number of places
   const id = Math.round(Math.random() * numberOfPlaces);
 
-  // if anyone of these returns anything other than false, the function stops inmediately
-  if ( throwErrorIfAttributeNotFound(request.body, "name", response) || 
-      throwErrorIfAttributeNotFound(request.body, "number", response) ){
-        return 1;
+  //This immediately stops the function if its return true
+  if (sendResponseErrorIfAnyAttributeNotFound(request.body, ["name", "number"], response)) return 1;
+
+  //If it's name is found before, this will throw an error 
+  if (TrueIfStringInPersons(request.body.name, "name")) {
+    return response.status(400).json({
+      "error" : 'name must be unique'
+    })
+
   }
 
   //The new object
@@ -83,14 +88,26 @@ app.delete("/api/persons/:id", (request, response) => {
   ifObjectNotTrueReturnStatus(personDeleted, 404, response);
 })
 
-//if the attribute its not found, it's going to throw a bad response to the request
-const throwErrorIfAttributeNotFound = (mainObject, attributeToCheck, response) => {
-  if (!mainObject[attributeToCheck]) {
-    return response.status(400).json({
-      "error" : `${attributeToCheck} missing`
-    })
-  }
+//if any of the attributes its not found, it's going to throw a bad response to the request
+const sendResponseErrorIfAnyAttributeNotFound = (mainObject, ListOfattributesToCheck, response) => {
+  ListOfattributesToCheck.map(attribute => {
+    if (!mainObject[attribute]) {
+      return response.status(400).json({
+        "error" : `${attribute} missing`
+      })
+    }
+  })
 };
+
+//If its inside the selected attribute of any of the persons, it will return true, otherwise false
+const TrueIfStringInPersons = (stringToFind, attributeToSearchIn) => {
+  const processedString = String(stringToFind);
+  const trueIfFound = persons.find(person => {
+    return String(person[attributeToSearchIn]) === processedString
+  })
+  //Ternary operator is used because not undefined object will be always true
+  return trueIfFound ? true : false;
+}
 
 //if its not and object/positive variable, its not going to be true, then it returns a error status, usually 404
 const ifObjectNotTrueReturnStatus = (object, statusCodeIfNotFound, responseObject) => {
