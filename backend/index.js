@@ -61,10 +61,8 @@ app.post("/api/persons", (request, response) => {
     return response.status(400).json({
       "error" : 'name must be unique'
     })
-
   }
-
-  //The new object
+  
   const newPerson = {
     "id": id,
     "name": request.body.name,
