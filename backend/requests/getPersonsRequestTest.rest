@@ -1,4 +1,13 @@
-GET http://localhost:3001/api/persons/3
+GET http://localhost:3001/api/persons
 
 ###
-DELETE http://localhost:3001/api/persons/3
+DELETE http://localhost:3001/api/persons/212
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "Albert Einstein",
+    "number": "321-391-23128"
+}

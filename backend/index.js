@@ -40,6 +40,35 @@ app.get("/api/persons/:id", (request, response) => {
   ifObjectNotTrueReturnStatus(person, 404, response);
 });
 
+
+app.get("/info", (request, response) => {
+  const description = `<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`;
+
+  response.send(description);
+})
+
+
+app.post("/api/persons", (request, response) => {
+  const numberOfPlaces = 1000
+  //This give us a random place from 1 to number of places
+  const id = Math.round(Math.random() * numberOfPlaces);
+
+  if (!body.name || !body.number) {
+    return response.status(400).json({ 
+      error: 'content missing' 
+    })
+  }
+  //The new object
+  const newPerson = {
+    "id": id,
+    "name": request.body.name,
+    "number": request.body.number
+  }
+  //Added in a inmutable way
+  persons = persons.concat(newPerson);
+  ifObjectNotTrueReturnStatus(persons, 404, response);
+});
+
 //This deletes the person object
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
@@ -48,17 +77,12 @@ app.delete("/api/persons/:id", (request, response) => {
   //This is an inverse filter
   const personsNotDeleted = persons.filter(person => person.id !== id)
   persons = personsNotDeleted;
-  console.log(persons);
 
   //Offloads the last part of the function
   ifObjectNotTrueReturnStatus(personDeleted, 404, response);
 })
 
-app.get("/info", (request, response) => {
-  const description = `<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`;
 
-  response.send(description);
-})
 
 //if its not and object/positive variable, its not going to be true, then it returns a error status, usually 404
 const ifObjectNotTrueReturnStatus = (object, statusCodeIfNotFound, responseObject) => {
