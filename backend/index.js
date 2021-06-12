@@ -53,11 +53,12 @@ app.post("/api/persons", (request, response) => {
   //This give us a random place from 1 to number of places
   const id = Math.round(Math.random() * numberOfPlaces);
 
-  if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'content missing' 
-    })
+  // if anyone of these returns anything other than false, the function stops inmediately
+  if ( throwErrorIfAttributeNotFound(request.body, "name", response) || 
+      throwErrorIfAttributeNotFound(request.body, "number", response) ){
+        return 1;
   }
+
   //The new object
   const newPerson = {
     "id": id,
@@ -82,7 +83,14 @@ app.delete("/api/persons/:id", (request, response) => {
   ifObjectNotTrueReturnStatus(personDeleted, 404, response);
 })
 
-
+//if the attribute its not found, it's going to throw a bad response to the request
+const throwErrorIfAttributeNotFound = (mainObject, attributeToCheck, response) => {
+  if (!mainObject[attributeToCheck]) {
+    return response.status(400).json({
+      "error" : `${attributeToCheck} missing`
+    })
+  }
+};
 
 //if its not and object/positive variable, its not going to be true, then it returns a error status, usually 404
 const ifObjectNotTrueReturnStatus = (object, statusCodeIfNotFound, responseObject) => {
