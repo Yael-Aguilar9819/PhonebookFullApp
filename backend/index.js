@@ -1,8 +1,11 @@
 const express = require('express')
+//This line uses the morgan library
+const morgan = require("morgan");
 const app = express()
-//This line invokes the json-parser from express
-app.use(express.json())
 
+//This lines invokes the json-parser from vanilla express and the morgan descriptor
+app.use(express.json())
+app.use(morgan("tiny"))
 let persons = [
   {
       id: 1,
