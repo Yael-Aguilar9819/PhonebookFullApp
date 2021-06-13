@@ -3,9 +3,28 @@ const express = require('express')
 const morgan = require("morgan");
 const app = express()
 
-//This lines invokes the json-parser from vanilla express and the morgan descriptor
+//This lines invokes the json-parser from vanilla express
 app.use(express.json())
-app.use(morgan("tiny"))
+
+const assignMessagePOST = (request, response, next) => {
+  if (request.method === "POST") {
+    request.messagePOSTReq = JSON.stringify(request.body);
+  } else {
+    request.messagePOSTReq = " "
+  }
+  next();
+}
+
+//This line generates a new token to the morgan library to use with a ":" just before
+//As an aclaration, this is ex
+morgan.token('messagePOSTReq', (request) => {
+  return request.messagePOSTReq
+})
+
+app.use(assignMessagePOST)
+app.use(morgan(':method :url - :response-time ms :messagePOSTReq'))
+
+// app.use(morgan("tiny"))
 let persons = [
   {
       id: 1,
