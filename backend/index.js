@@ -3,6 +3,10 @@ const express = require('express')
 const morgan = require("morgan");
 const app = express()
 
+//It's necesary to have cors
+const cors = require('cors')
+app.use(cors())
+
 //This lines invokes the json-parser from vanilla express
 app.use(express.json())
 
