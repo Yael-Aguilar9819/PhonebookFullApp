@@ -110,10 +110,11 @@ const App = () => {
 
   const falseIfStringEmpty = str => str.length === 0 ? false : true
 
+  //This is the filter to the person part
   const filterToSearch = () => {
     if (!falseIfStringEmpty(nameToSearch)) return elem => elem
 
-    return elem => elem.name.toLowerCase().substr(0, nameToSearch.length) === nameToSearch
+    return elem => elem.name.toLowerCase().substr(0, nameToSearch.length) === nameToSearch.toLowerCase();
   }
 
 
@@ -122,7 +123,7 @@ const App = () => {
     <div className={styles.mainContainer}>
       <h2>Phonebook</h2>
       <NotificationMessage messageInfo={messageInfo}/>
-      <InputText functionControlChange={handleSearchBoxChange} currentInputControl={nameToSearch} textDisplay={"filter shown with"}/>      
+      <InputText functionControlChange={handleSearchBoxChange} currentInputControl={nameToSearch} textDisplay={"Filter shown with"}/>      
       <h2>Add a new person contact info</h2>
       <PersonForm
         textInput1={<InputText functionControlChange={handleNameChange} currentInputControl={newName} textDisplay={"name"}/>} 
