@@ -1,10 +1,7 @@
-const baseUrl = "http://localhost:3001/persons";
-
-// return methodToBackendReturnJson(`${baseUrl}/${id}`, "PUT", JSON.stringify(newObject));
-
+// const baseUrl = "http://localhost:3001/persons"; the old baseUrl
+const baseUrl = '/api/persons';
 
 //This is simply our abstraction layer to the backend, that's how we will comunicate to the backend, whataever it is
-
 //This downloads all the notes and sends them to the frontend, it's fired at the start of the page
 const methodToBackendJsonResponse = async (url, method, objectToSend) => {
     const respFromServer = await 
