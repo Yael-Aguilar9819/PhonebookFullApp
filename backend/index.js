@@ -1,11 +1,17 @@
 const express = require('express')
-//This line uses the morgan library
-const morgan = require("morgan");
 const app = express()
 
-//It's necesary to have cors
+//middlewares
+//this makes express search in the /build folder for the static files
+app.use(express.static('build'))
+
+//It's necesary to have cors for this app to work
 const cors = require('cors')
 app.use(cors())
+
+//This line uses the morgan library
+const morgan = require("morgan");
+
 
 //This lines invokes the json-parser from vanilla express
 app.use(express.json())
