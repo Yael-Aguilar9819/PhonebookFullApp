@@ -1,0 +1,35 @@
+.basicMessage {
+  height: 25px;
+  margin: 1%;
+  padding: 0;
+}
+
+.positiveMessage {
+  composes: basicMessage;
+  color: green;
+}
+
+.negativeMessage {
+  composes: basicMessage;
+  color: red;
+}
+
+
+/* It's the same component, just a different sentiment to it */
+.positiveContainer {
+  border-style: solid;
+  border-color: green;
+  margin: 15px 15px;
+  height: 50px;
+  border-radius: 8px;
+  background-color: #e0e0d1;
+}
+
+.negativeContainer {
+  border-style: solid;
+  border-color: red;
+  margin: 15px 15px;
+  height: 50px;
+  border-radius: 8px;
+  background-color: #e0e0d1;
+}
