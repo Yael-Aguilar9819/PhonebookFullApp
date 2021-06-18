@@ -2,12 +2,13 @@ const express = require('express')
 const app = express()
 
 //middlewares
-//this makes express search in the /build folder for the static files
-app.use(express.static('build'))
 
 //It's necesary to have cors for this app to work
 const cors = require('cors')
 app.use(cors())
+
+//this makes express search in the /build folder for the static files
+app.use(express.static('build'))
 
 //This line uses the morgan library
 const morgan = require("morgan");
