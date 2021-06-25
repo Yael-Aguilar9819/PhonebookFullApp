@@ -20,15 +20,7 @@ const url =
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 
-//this is the route if the only arg it's the pass, it prints an index of all of the persons in the phonebook
-if (lengthOfArgs === 3) {
-
-  mongoose.connection.close();
-  process.exit(0);
-}
-
-//otherwise, it will add a new note to the phonebook
-//It's used as a number because the phonenumber should be added as it is
+//It's formatted as a string because the phonenumber should be added as it is
 const personSchema = new mongoose.Schema({
   name: String,
   number: String,
@@ -36,20 +28,37 @@ const personSchema = new mongoose.Schema({
 
 const Person = mongoose.model("Person", personSchema);
 
-let personName = process.argv[3]; 
-//this will choose between 4 and 5 args, to add the correct personNumber
-let personNumber = lengthOfArgs > 4 ? process.argv[4].toString() : "";
 
-const person = new Person({
-  name: personName,
-  number: personNumber,
-})
 
-//This reports to the console and close the connection
-person.save().then(result => {
-  console.log(`added ${personName} number ${personNumber} to phonebook`);
-  mongoose.connection.close()
-})
+//this is the route if the only arg it's the pass, it prints an index of all of the persons in the phonebook
+if (lengthOfArgs === 3) {
+  Person.find({}).then(result => {
+    result.forEach(person => {
+      console.log(person);
+    })
+    //Then we close the connection to the DB
+    mongoose.connection.close()
+  })
+}
+
+//otherwise, it will add a new person to the phonebook
+else {
+  let personName = process.argv[3]; 
+  //this will choose between 4 and 5 args, to add the correct personNumber
+  let personNumber = lengthOfArgs > 4 ? process.argv[4].toString() : "";
+
+  const person = new Person({
+    name: personName,
+    number: personNumber,
+  })
+
+  //This reports to the console and close the connection
+  person.save().then(result => {
+    console.log(`added ${personName} number ${personNumber} to phonebook`);
+    mongoose.connection.close()
+  })
+}
+
 // const url =
 //   `mongodb+srv://fullstack:${password}@cluster0-ostce.mongodb.net/test?retryWrites=true`
 
