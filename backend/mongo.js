@@ -16,7 +16,7 @@ else if (lengthOfArgs > 5) {
 //This is the boilerplate that connects to the DB if the password is correct, otherwise will throw an error
 const password = process.argv[2]
 const url =
-  `mongodb+srv://userwork1:${password}@cluster0.ftzxk.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+  `mongodb+srv://userwork1:${password}@cluster0.ftzxk.mongodb.net/phonebook-app?retryWrites=true&w=majority`
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
 
@@ -58,27 +58,3 @@ else {
     mongoose.connection.close()
   })
 }
-
-// const url =
-//   `mongodb+srv://fullstack:${password}@cluster0-ostce.mongodb.net/test?retryWrites=true`
-
-// mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-
-// const noteSchema = new mongoose.Schema({
-//   content: String,
-//   date: Date,
-//   important: Boolean,
-// })
-
-// const Note = mongoose.model('Note', noteSchema)
-
-// const note = new Note({
-//   content: 'HTML is Easy',
-//   date: new Date(),
-//   important: true,
-// })
-
-// note.save().then(result => {
-//   console.log('note saved!')
-//   mongoose.connection.close()
-// })
