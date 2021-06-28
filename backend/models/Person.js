@@ -20,5 +20,14 @@ const personSchema = new mongoose.Schema({
   number: String,
 })
 
+//This is kind of a middleware inside the schema, because it's going to be used in all person objects
+personSchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
 //To make it usable, it needs to be exported so it can be imported and used for other modules 
 module.exports = mongoose.model('Person', personSchema);

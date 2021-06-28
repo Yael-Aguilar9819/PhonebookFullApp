@@ -37,28 +37,28 @@ app.use(morgan(':method :url - :response-time ms :messagePOSTReq'))
 const mongoose = require("mongoose");
 const Person = require('./models/person.js');
 
-let persons = [
-  {
-      id: 1,
-      name: "Arto Hellas",
-      number: "040-123456"
-  },
-  {
-      id: 2,
-      name: "Ada lovelace",
-      number: "39-44-5323352"
-  },
-  {
-      id: 3,
-      name: "Dan Abramov",
-      number: "12-43-2345612"
-  },
-  {
-      id: 4,
-      name: "Mary Poppendick",
-      number: "39-23-6423122"
-  }
-]
+// let persons = [
+//   {
+//       id: 1,
+//       name: "Arto Hellas",
+//       number: "040-123456"
+//   },
+//   {
+//       id: 2,
+//       name: "Ada lovelace",
+//       number: "39-44-5323352"
+//   },
+//   {
+//       id: 3,
+//       name: "Dan Abramov",
+//       number: "12-43-2345612"
+//   },
+//   {
+//       id: 4,
+//       name: "Mary Poppendick",
+//       number: "39-23-6423122"
+//   }
+// ]
 
 //This is the default route api, it shouldn't be able to be seen, but still here
 app.get('/', (request, response) => {
@@ -67,28 +67,27 @@ app.get('/', (request, response) => {
 
 
 app.get("/api/persons", (request, response) => {
-  // response.send(persons);
   //the {} is the empty filter, so everything goes through
   Person.find({}).then(person => {
     response.send(person);
   })
 });
 
-//This is the view for the each id
+//This is the view for the each id, it's usng findById which is a mongoose-specific function 
 app.get("/api/persons/:id", (request, response) => {
-  //It saves resources because otherwise, it would be casted as a number again and again
-  const id = Number(request.params.id);
-  const person = persons.find(person => person.id === id);
-  
-  //This just offloads the last part of function
-  ifObjectNotTrueReturnStatus(person, 404, response);
+  Person.findById(request.params.id).then(person => {
+    response.json(person);
+  }).catch(err => {
+    console.log(err);
+  })
 });
 
-
+//Now it's an async response, using the object length from the response
 app.get("/info", (request, response) => {
-  const description = `<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`;
-
-  response.send(description);
+  Person.find({}).then(persons => {
+    response.send(`<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`);
+  })
+  // const description = `<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`;
 })
 
 
