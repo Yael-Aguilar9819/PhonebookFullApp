@@ -2,7 +2,6 @@ const express = require('express')
 const app = express()
 
 //middlewares
-
 //This lines invokes the json-parser from vanilla express
 app.use(express.json())
 
@@ -14,9 +13,8 @@ const cors = require('cors')
 app.use(cors())
 
 
-//This line uses the morgan library
+//This line uses the morgan library to create a custom middleware 
 const morgan = require("morgan");
-
 
 const assignMessagePOST = (request, response, next) => {
   if (request.method === "POST") {
@@ -28,7 +26,6 @@ const assignMessagePOST = (request, response, next) => {
 }
 
 //This line generates a new token to the morgan library to use with a ":" just before
-//As an aclaration, this is ex
 morgan.token('messagePOSTReq', (request) => {
   return request.messagePOSTReq
 })
@@ -36,7 +33,10 @@ morgan.token('messagePOSTReq', (request) => {
 app.use(assignMessagePOST)
 app.use(morgan(':method :url - :response-time ms :messagePOSTReq'))
 
-// app.use(morgan("tiny"))
+//This is the model that let use create and create Persons contact info
+const mongoose = require("mongoose");
+const Person = require('./models/person.js');
+
 let persons = [
   {
       id: 1,
@@ -67,7 +67,11 @@ app.get('/', (request, response) => {
 
 
 app.get("/api/persons", (request, response) => {
-    response.send(persons);
+  // response.send(persons);
+  //the {} is the empty filter, so everything goes through
+  Person.find({}).then(person => {
+    response.json(person);
+  })
 });
 
 //This is the view for the each id
