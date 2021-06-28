@@ -20,5 +20,5 @@ const personSchema = new mongoose.Schema({
   number: String,
 })
 
-//To make it usable, it needed to 
-module.exports = mongoose.model('Note', personSchema);
+//To make it usable, it needs to be exported so it can be imported and used for other modules 
+module.exports = mongoose.model('Person', personSchema);

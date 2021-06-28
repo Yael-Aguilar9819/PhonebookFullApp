@@ -70,7 +70,7 @@ app.get("/api/persons", (request, response) => {
   // response.send(persons);
   //the {} is the empty filter, so everything goes through
   Person.find({}).then(person => {
-    response.json(person);
+    response.send(person);
   })
 });
 
