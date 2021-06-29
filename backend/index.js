@@ -87,36 +87,27 @@ app.get("/info", (request, response) => {
   Person.find({}).then(persons => {
     response.send(`<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`);
   })
-  // const description = `<p>Phonebook has info of ${persons.length} people</p> <p>${getActualHourWithDate()}</p>`;
 })
 
 
 app.post("/api/persons", (request, response) => {
-  const numberOfPlaces = 1000
-  //This give us a random place from 1 to number of places
-  const id = Math.round(Math.random() * numberOfPlaces);
-
   //This immediately stops the function if its return true
   if (sendResponseErrorIfAnyAttributeNotFound(request.body, ["name", "number"], response)) return 1;
 
-  //If it's name is found before, this will throw an error 
-  if (TrueIfStringInPersons(request.body.name, "name")) {
-    return response.status(400).json({
-      "error" : 'name must be unique'
-    })
-  }
-  
-  const newPerson = {
-    "id": id,
+  //Creates the new object person through the person.js model
+  const newPerson = new Person ({
     "name": request.body.name,
     "number": request.body.number
-  }
-  //Added in a inmutable way
-  persons = persons.concat(newPerson);
-  ifObjectNotTrueReturnStatus(persons, 404, response);
+  })
+  //now is an async op
+  newPerson.save().then(savedPerson => {
+    response.json(savedPerson);
+  }).catch(err => {
+    console.log(err);
+  })
 });
 
-//This deletes the person object
+//TO DO, it's not connected to the remote server yet
 app.delete("/api/persons/:id", (request, response) => {
   const id = Number(request.params.id);
   const personDeleted = persons.find(person => person.id === id);
