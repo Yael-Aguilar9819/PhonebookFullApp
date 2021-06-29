@@ -37,29 +37,6 @@ app.use(morgan(':method :url - :response-time ms :messagePOSTReq'))
 const mongoose = require("mongoose");
 const Person = require('./models/person.js');
 
-// let persons = [
-//   {
-//       id: 1,
-//       name: "Arto Hellas",
-//       number: "040-123456"
-//   },
-//   {
-//       id: 2,
-//       name: "Ada lovelace",
-//       number: "39-44-5323352"
-//   },
-//   {
-//       id: 3,
-//       name: "Dan Abramov",
-//       number: "12-43-2345612"
-//   },
-//   {
-//       id: 4,
-//       name: "Mary Poppendick",
-//       number: "39-23-6423122"
-//   }
-// ]
-
 //This is the default route api, it shouldn't be able to be seen, but still here
 app.get('/', (request, response) => {
   response.send('<h1>Hello World!!</h1>');
