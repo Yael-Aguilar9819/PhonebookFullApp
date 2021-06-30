@@ -51,11 +51,11 @@ app.get("/api/persons", (request, response) => {
 });
 
 //This is the view for the each id, it's usng findById which is a mongoose-specific function 
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   Person.findById(request.params.id).then(person => {
     response.json(person);
   }).catch(err => {
-    console.log(err);
+    next(err);
   })
 });
 
@@ -85,14 +85,14 @@ app.post("/api/persons", (request, response) => {
 });
 
 //TO DO, it's not connected to the remote server yet
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   //This is a mongoose method, that offloads everything to this func
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
       //204: no response-status
       response.status(204).end();
     })
-    .catch(err => console.log(err))
+    .catch(err => next(err))
 })
 
 //if any of the attributes its not found, it's going to throw a bad response to the request
@@ -106,7 +106,28 @@ const sendResponseErrorIfAnyAttributeNotFound = (mainObject, ListOfattributesToC
   })
 };
 
+//Certain error, invoked with next() use this
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+  next(error)
+}
+// this has to be the last loaded middleware.
+app.use(errorHandler)
+
+
+//Unknown url response when it's not a category controlled by the errorHandler
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
+
+
 //If its inside the selected attribute of any of the persons, it will return true, otherwise false
+// Needs reform 
 const TrueIfStringInPersons = (stringToFind, attributeToSearchIn) => {
   const processedString = String(stringToFind);
   const trueIfFound = persons.find(person => {
