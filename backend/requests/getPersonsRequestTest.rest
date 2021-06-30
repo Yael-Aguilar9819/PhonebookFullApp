@@ -14,3 +14,6 @@ Content-Type: application/json
     "name": "Albert Einstein",
     "number": "321-391-23128"
 }
+
+###
+DELETE http://localhost:3001/api/persons/60da46b5dd3c1f22309b643f

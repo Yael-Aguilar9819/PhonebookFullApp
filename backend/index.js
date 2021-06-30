@@ -86,15 +86,13 @@ app.post("/api/persons", (request, response) => {
 
 //TO DO, it's not connected to the remote server yet
 app.delete("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const personDeleted = persons.find(person => person.id === id);
-
-  //This is an inverse filter
-  const personsNotDeleted = persons.filter(person => person.id !== id)
-  persons = personsNotDeleted;
-
-  //Offloads the last part of the function
-  ifObjectNotTrueReturnStatus(personDeleted, 404, response);
+  //This is a mongoose method, that offloads everything to this func
+  Person.findByIdAndRemove(request.params.id)
+    .then(result => {
+      //204: no response-status
+      response.status(204).end();
+    })
+    .catch(err => console.log(err))
 })
 
 //if any of the attributes its not found, it's going to throw a bad response to the request
