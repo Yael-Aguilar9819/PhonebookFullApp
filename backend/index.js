@@ -66,8 +66,8 @@ app.get("/info", (request, response) => {
   })
 })
 
-
-app.post("/api/persons", (request, response) => {
+//This creates a new object
+app.put("/api/persons", (request, response) => {
   //This immediately stops the function if its return true
   if (sendResponseErrorIfAnyAttributeNotFound(request.body, ["name", "number"], response)) return 1;
 
@@ -135,14 +135,6 @@ const TrueIfStringInPersons = (stringToFind, attributeToSearchIn) => {
   })
   //Ternary operator is used because not undefined object will be always true
   return trueIfFound ? true : false;
-}
-
-//if its not and object/positive variable, its not going to be true, then it returns a error status, usually 404
-const ifObjectNotTrueReturnStatus = (object, statusCodeIfNotFound, responseObject) => {
-  if (object) {
-    responseObject.send(object);        
-  }
-  responseObject.status(statusCodeIfNotFound).end();
 }
 
 //This just compose both functions and make them a full date
