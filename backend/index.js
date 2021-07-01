@@ -107,7 +107,9 @@ app.delete("/api/persons/:id", (request, response, next) => {
   //This is a mongoose method, that offloads everything to this func
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
-      //204: no response-status
+      //if it's null, its because there was deleted before
+      if (result === null) response.status(404).end();
+      //else, it's going to response with 204: no response-status
       response.status(204).end();
     })
     .catch(err => next(err))

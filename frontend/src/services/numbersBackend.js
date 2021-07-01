@@ -12,11 +12,12 @@ const methodToBackendJsonResponse = async (url, method, objectToSend) => {
                         },
                         body: JSON.stringify(objectToSend)
                     })
-    //This guarantees the server response it's between 0 and 200
-    if (respFromServer.status - 200 >= 99) {
+
+    //This guarantees a positive response if it's between 0 and 299
+    if (respFromServer.status >= 300) {
         throw new Error(`cannot fetch data with error code: ${respFromServer.status}`);
     }      
-    return respFromServer.json();
+    return respFromServer;
 }
 
 const getAll = async () => {
@@ -32,9 +33,10 @@ const getAll = async () => {
 //The simple POST method using async, restructured to make it easier to use
 const sendNewPersonInfo = async (personInfoObject) => {
     const responseFromServer = await methodToBackendJsonResponse(baseUrl, "POST", personInfoObject);
-    return responseFromServer;
+    return responseFromServer.json();
 }
 
+//This method doesn't return .json() because it's a not-response
 const deletePerson = async personID => {
     const responseFromServer = await methodToBackendJsonResponse(`${baseUrl}/${personID}`, "DELETE", {personID});  
     return responseFromServer;
@@ -42,7 +44,7 @@ const deletePerson = async personID => {
 
 const modifyPersonInfo = async personObject => {
     const responseFromServer = await methodToBackendJsonResponse(`${baseUrl}/${personObject.id}`, "PUT", personObject);  
-    return responseFromServer;
+    return responseFromServer.json();
 }
 
 //Cleaner with object initializer ES2015
