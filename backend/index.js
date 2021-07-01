@@ -67,24 +67,42 @@ app.get("/info", (request, response) => {
 })
 
 //This creates a new object
-app.put("/api/persons", (request, response) => {
-  //This immediately stops the function if its return true
-  if (sendResponseErrorIfAnyAttributeNotFound(request.body, ["name", "number"], response)) return 1;
+app.post("/api/persons", (request, response, next) => {
+  //This immediately stops the function if its true
+  if (sendErrorResponseIfAnyAttributeNotFound(request.body, ["name", "number"], response)) return 1;
 
   //Creates the new object person through the person.js model
-  const newPerson = new Person ({
+  const newPerson = new Person({
     "name": request.body.name,
     "number": request.body.number
   })
-  //now is an async op
+
+  // now is an async operation, that responds with the object 
+  // or just throw an error
   newPerson.save().then(savedPerson => {
     response.json(savedPerson);
-  }).catch(err => {
-    console.log(err);
-  })
+    })
+    .catch(err => {
+      console.log(err);
+    })
 });
 
-//TO DO, it's not connected to the remote server yet
+//this route will be the one that modifies a entry if given the correct ID
+//if its not, will throw an error through the handle
+app.put("/api/persons/:id", (request, response, next) => {
+  const personToReturn = new Person({
+    "name": request.body.name,
+    "number": request.body.number
+  })
+  //Takes 2 args, 1. the ID, and 2 is the attributes you want to modify
+  Person.findByIdAndUpdate(request.params.id, {number: request.body.number})
+    .then(responseFromDB => {
+      response.json(responseFromDB);
+    })
+    //offloaded to the errorHandler
+    .catch(err => next(err))
+})
+
 app.delete("/api/persons/:id", (request, response, next) => {
   //This is a mongoose method, that offloads everything to this func
   Person.findByIdAndRemove(request.params.id)
@@ -96,7 +114,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
 })
 
 //if any of the attributes its not found, it's going to throw a bad response to the request
-const sendResponseErrorIfAnyAttributeNotFound = (mainObject, ListOfattributesToCheck, response) => {
+const sendErrorResponseIfAnyAttributeNotFound = (mainObject, ListOfattributesToCheck, response) => {
   ListOfattributesToCheck.map(attribute => {
     if (!mainObject[attribute]) {
       return response.status(400).json({
@@ -126,16 +144,19 @@ const unknownEndpoint = (request, response) => {
 app.use(unknownEndpoint)
 
 
-//If its inside the selected attribute of any of the persons, it will return true, otherwise false
-// Needs reform 
-const TrueIfStringInPersons = (stringToFind, attributeToSearchIn) => {
-  const processedString = String(stringToFind);
-  const trueIfFound = persons.find(person => {
-    return String(person[attributeToSearchIn]) === processedString
-  })
-  //Ternary operator is used because not undefined object will be always true
-  return trueIfFound ? true : false;
+const updateOrForcePersonCreation = async newPersonObject => {
+  const responseFromMongoose = await Person.updateOne({ name: newPersonObject.name}, 
+                                                      { number: newPersonObject.number})
+
+  // n is the number of entries that were modified                                                    
+  if (responseFromMongoose.n === 1) { /// if it was found and modified
+    return newPersonObject;
+  } else { //if it wasn't find an object with this name
+    const responseFromNewObject = await newPersonObject.save();
+    return responseFromNewObject;
+  }
 }
+
 
 //This just compose both functions and make them a full date
 const getActualHourWithDate = () => {
@@ -144,7 +165,8 @@ const getActualHourWithDate = () => {
   return `${actualDate} ${actualHour}`;
 };
 
-const PORT =  process.env.PORT || 3001
+//with dotenv it's easy to modify the default port
+const PORT =  process.env.PORT
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
