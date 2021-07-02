@@ -52,8 +52,12 @@ app.get("/api/persons", (request, response) => {
 
 //This is the view for the each id, it's usng findById which is a mongoose-specific function 
 app.get("/api/persons/:id", (request, response, next) => {
+  //findById uses the ID and then returns it, if it fails goes to the errorhandler
   Person.findById(request.params.id).then(person => {
-    response.json(person);
+    //Added if else because if it's not fiund, it's going to return null
+    //else it means that it was found, and we proceed as usual
+    if (person === null) response.status(404).end();
+    else response.json(person);
   }).catch(err => {
     next(err);
   })
