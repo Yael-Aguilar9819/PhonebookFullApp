@@ -13,7 +13,7 @@ const cors = require('cors')
 app.use(cors())
 
 
-//This line uses the morgan library to create a custom middleware 
+//This line uses the morgan library to create a custom middleware that logs to the console
 const morgan = require("morgan");
 
 const assignMessagePOST = (request, response, next) => {
@@ -87,7 +87,7 @@ app.post("/api/persons", (request, response, next) => {
     response.json(savedPerson);
     })
     .catch(err => {
-      console.log(err);
+      next(err);
     })
 });
 
@@ -133,10 +133,13 @@ const sendErrorResponseIfAnyAttributeNotFound = (mainObject, ListOfattributesToC
 //Certain error, invoked with next() use this
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
-
+  //native mongoose error
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
-  } 
+  //This validation errs are given by unique-validator package installed from npm
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
   next(error)
 }
 // this has to be the last loaded middleware.
@@ -157,7 +160,7 @@ const updateOrForcePersonCreation = async newPersonObject => {
   // n is the number of entries that were modified                                                    
   if (responseFromMongoose.n === 1) { /// if it was found and modified
     return newPersonObject;
-  } else { //if it wasn't find an object with this name
+  } else { //if it wasn't found an object with this name
     const responseFromNewObject = await newPersonObject.save();
     return responseFromNewObject;
   }

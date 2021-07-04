@@ -1,4 +1,7 @@
 const mongoose = require('mongoose')
+//Mongoose doesn't have a default unique validator, so this is a npm package from that
+var uniqueValidator = require('mongoose-unique-validator');
+
 
 //This will let us use the env variables
 require('dotenv').config()
@@ -16,9 +19,16 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
 
 //And this is the main schema of the person object
 const personSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    minLength: 2,
+    unique: true,
+    required: true
+  },
   number: String,
 })
+personSchema.plugin(uniqueValidator);
+
 
 //This is kind of a middleware inside the schema, because it's going to be used in all person objects
 personSchema.set('toJSON', {
