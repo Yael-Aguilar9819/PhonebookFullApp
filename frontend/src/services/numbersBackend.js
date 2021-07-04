@@ -12,8 +12,7 @@ const methodToBackendJsonResponse = async (url, method, objectToSend) => {
                         },
                         body: JSON.stringify(objectToSend)
                     })
-
-    //This guarantees a positive response if it's between 0 and 299
+    //This guarantees a positive response or a handled error if it's between 0 and 299
     if (respFromServer.status >= 300) {
         throw new Error(`cannot fetch data with error code: ${respFromServer.status}`);
     }      
@@ -33,7 +32,9 @@ const getAll = async () => {
 //The simple POST method using async, restructured to make it easier to use
 const sendNewPersonInfo = async (personInfoObject) => {
     const responseFromServer = await methodToBackendJsonResponse(baseUrl, "POST", personInfoObject);
-    return responseFromServer.json();
+    responseFromServer
+        .then(resp => resp.json())
+        .catch(err => err.json())
 }
 
 //This method doesn't return .json() because it's a not-response

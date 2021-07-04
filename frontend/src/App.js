@@ -62,9 +62,13 @@ const App = () => {
       personsInfoService.sendNewPersonInfo(newObjectPerson)
         .then(resp => {
           newObjectPerson.id = resp.id
-          showMessageForXSeconds(`Added ${newObjectPerson.name}.`, 2, "positive")
+          showMessageForXSeconds(`Added ${newObjectPerson.name}.`, 3, "positive")
+          setPersons(persons.concat(newObjectPerson))
         })
-      setPersons(persons.concat(newObjectPerson))
+        //Now it can handle errors
+        .catch(error => {
+        showMessageForXSeconds(`${newObjectPerson.name} couldn't be added.`, 3, "negative")
+      })
     }
     setNewName("")
     setNewNumber("")
