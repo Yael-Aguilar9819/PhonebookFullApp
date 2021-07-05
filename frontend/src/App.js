@@ -73,26 +73,33 @@ const App = () => {
 
   //The post correct response is offloaded to this function
   const handleCorrectPOSTResponse = (personObject, responseFromServ) => {
-    if (responseFromServ.ok === true) { //this means that the response was accepted by the server
-      personObject.id = responseFromServ.id
-      showMessageForXSeconds(`Added ${personObject.name}.`, 3, "positive")
-      setPersons(persons.concat(personObject)) 
-    } else { //if it's not ok (between 200 and 299, it's going to be an incorrect response, so it's handled here)
-      responseFromServ.json().then(errorResp =>{
-      showMessageForXSeconds(`${errorResp.error}`, 5, "negative")
-      })
-    }
-  }
-
-
+    //If we start with a json conversions we can use both the headers and the body
+    responseFromServ.json().then(bodyOfResp => {
+      if (responseFromServ.ok === true) { //this means that the response was accepted by the server
+        personObject.id = bodyOfResp.id
+        showMessageForXSeconds(`Added ${personObject.name}.`, 3, "positive")
+        setPersons(persons.concat(personObject)) 
+      } else { //if it's not ok (between 200 and 299, it's going to be an incorrect response, so it's handled here)
+        showMessageForXSeconds(`${bodyOfResp.error}`, 5, "negative")
+        }
+    }) //this should never happen, but for security it should be handled anyway
+    .catch(err => console.log(err))
+}
+  
+  //this is the PUT request that connects to the backend through the backend-service
   const modifyPersonInfoInServerAndFront = (newObjectPerson, indexOfName, personsArray) => {
     //doing it the inmutable way
     const newPersonsArray = personsArray.slice(0, indexOfName)
       .concat(newObjectPerson)
       .concat(personsArray.slice(indexOfName + 1))
     
-      personsInfoService.modifyPersonInfo(newObjectPerson)
-      .then(resp =>  console.log(resp))
+    //this now connects to the backend-service
+    personsInfoService.modifyPersonInfo(newObjectPerson)
+      .then(resp => console.log(resp))
+      .catch(err => {
+        console.log(err)
+        showMessageForXSeconds(`The person couldn't be updated, try again in a few minutes.`, 5, "negative")
+      })
     setPersons(newPersonsArray)
   }
 
@@ -113,14 +120,21 @@ const App = () => {
     if (!userConfirmation) return 0;
 
     personsInfoService.deletePerson(personObject.id)
-      .then(resp => console.log(`Success deleting ${personObject.name}!`))
-      .catch(err => {
-        showMessageForXSeconds(`Information of ${personObject.name} has already been removed from server.`, 3, "negative")
-        console.log(err)})
-
+      .then(resp => handleCorrectDeleteResp(personObject.name, resp))
     const newPersons = persons.filter(person => person.id !== personObject.id);
     setPersons(newPersons);
   }
+
+  //The post correct response is offloaded to this function
+  const handleCorrectDeleteResp = (personName, responseFromServ) => {
+    if (responseFromServ.ok === true) { //this means that the response was accepted by the server
+      console.log(`Success deleting ${personName}.`)
+      showMessageForXSeconds(`Success deleting ${personName}!.`, 3, "positive")
+    } else { //if it's not ok (between 200 and 299, it's going to be an incorrect response, so it's handled here)
+      console.log(responseFromServ);
+      showMessageForXSeconds(`Information of ${personName} has already been removed from server.`, 3, "negative")
+      }
+    }
 
   const falseIfStringEmpty = str => str.length === 0 ? false : true
 

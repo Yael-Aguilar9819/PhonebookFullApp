@@ -34,7 +34,7 @@ const sendNewPersonInfo = async (personInfoObject) => {
 //This method doesn't return .json() because it's a not-response
 const deletePerson = async personID => {
     const responseFromServer = await methodToBackendJsonResponse(`${baseUrl}/${personID}`, "DELETE", {personID});  
-    return responseFromServer.json();
+    return responseFromServer;
 }
 
 const modifyPersonInfo = async personObject => {
