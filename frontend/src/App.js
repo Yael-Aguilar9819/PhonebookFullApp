@@ -51,30 +51,40 @@ const App = () => {
     const indexOfName = persons.findIndex(personName => personName.name.toLowerCase() === newName.toLowerCase())
 
     //If it's different than -1, it means that it doesnt exit in the list
-    if (indexOfName !== -1) {
+    if (indexOfName !== -1) { //this questions the user so s/he knows that it's an already created user
       const userConfirmation = window.confirm(`${newObjectPerson.name} is already added to phonebook, replace the old number with a new one?`)
       if (userConfirmation === false) return 0
-
       newObjectPerson.id = persons[indexOfName].id;
       modifyPersonInfoInServerAndFront(newObjectPerson, indexOfName, persons);
     } else {
       //Changed this, so the personObject will have the ID from the start
       personsInfoService.sendNewPersonInfo(newObjectPerson)
-        .then(resp => {
-          newObjectPerson.id = resp.id
-          showMessageForXSeconds(`Added ${newObjectPerson.name}.`, 3, "positive")
-          setPersons(persons.concat(newObjectPerson))
-        })
+        .then(resp => { // this function handles everything even if it's a negative response from server
+          handleCorrectPOSTResponse(newObjectPerson, resp)})
         //Now it can handle errors
         .catch(error => {
-        showMessageForXSeconds(`${newObjectPerson.name} couldn't be added.`, 3, "negative")
+        console.log(error);
+      showMessageForXSeconds(`There was an error in the server, try again in a few minutes.`, 5, "negative")  
       })
     }
     setNewName("")
     setNewNumber("")
   }
 
-  
+  //The post correct response is offloaded to this function
+  const handleCorrectPOSTResponse = (personObject, responseFromServ) => {
+    if (responseFromServ.ok === true) { //this means that the response was accepted by the server
+      personObject.id = responseFromServ.id
+      showMessageForXSeconds(`Added ${personObject.name}.`, 3, "positive")
+      setPersons(persons.concat(personObject)) 
+    } else { //if it's not ok (between 200 and 299, it's going to be an incorrect response, so it's handled here)
+      responseFromServ.json().then(errorResp =>{
+      showMessageForXSeconds(`${errorResp.error}`, 5, "negative")
+      })
+    }
+  }
+
+
   const modifyPersonInfoInServerAndFront = (newObjectPerson, indexOfName, personsArray) => {
     //doing it the inmutable way
     const newPersonsArray = personsArray.slice(0, indexOfName)
