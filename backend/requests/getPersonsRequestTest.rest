@@ -12,7 +12,7 @@ Content-Type: application/json
 
 {
     "name": "Arto Hellassda",
-    "number": "5321-321-23"
+    "number": "5321-"
 }
 
 ###
