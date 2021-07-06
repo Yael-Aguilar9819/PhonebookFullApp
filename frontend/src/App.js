@@ -57,33 +57,31 @@ const App = () => {
       newObjectPerson.id = persons[indexOfName].id;
       modifyPersonInfoInServerAndFront(newObjectPerson, indexOfName, persons);
     } else {
-      //Changed this, so the personObject will have the ID from the start
-      personsInfoService.sendNewPersonInfo(newObjectPerson)
-        .then(resp => { // this function handles everything even if it's a negative response from server
-          handleCorrectPOSTResponse(newObjectPerson, resp)})
-        //Now it can handle errors
+      //now is an async function - refactored
+      handleCorrectPOSTResponse(newObjectPerson)
+        .then(resp => console.log(resp))
         .catch(error => {
-        console.log(error);
-      showMessageForXSeconds(`There was an error in the server, try again in a few minutes.`, 5, "negative")  
+          console.log(error);
+          showMessageForXSeconds(`There was an error in the server, try again in a few minutes.`, 5, "negative")  
       })
     }
     setNewName("")
     setNewNumber("")
   }
 
-  //The post correct response is offloaded to this function
-  const handleCorrectPOSTResponse = (personObject, responseFromServ) => {
-    //If we start with a json conversions we can use both the headers and the body
-    responseFromServ.json().then(bodyOfResp => {
-      if (responseFromServ.ok === true) { //this means that the response was accepted by the server
-        personObject.id = bodyOfResp.id
-        showMessageForXSeconds(`Added ${personObject.name}.`, 3, "positive")
-        setPersons(persons.concat(personObject)) 
-      } else { //if it's not ok (between 200 and 299, it's going to be an incorrect response, so it's handled here)
-        showMessageForXSeconds(`${bodyOfResp.error}`, 5, "negative")
-        }
-    }) //this should never happen, but for security it should be handled anyway
-    .catch(err => console.log(err))
+  //The post correct response is offloaded to this function, now an async function
+  const handleCorrectPOSTResponse = async (personObject) => {
+    //Added the backend-service to this function because of cohesion 
+    const mainPOSTRequest = await personsInfoService.sendNewPersonInfo(personObject);
+    const bodyOfResp = await mainPOSTRequest.json();
+    if (mainPOSTRequest.ok === true) { //this means that the response was accepted by the server
+      personObject.id = bodyOfResp.id
+      showMessageForXSeconds(`Added ${personObject.name}.`, 3, "positive")
+      setPersons(persons.concat(personObject))
+    } else { //if it's not ok (between 200 and 299, it's going to be an incorrect response, so it's handled here)
+      showMessageForXSeconds(`${bodyOfResp.error}`, 5, "negative")
+    }
+    return bodyOfResp;
 }
   
   //this is the PUT request that connects to the backend through the backend-service
@@ -121,6 +119,7 @@ const App = () => {
 
     personsInfoService.deletePerson(personObject.id)
       .then(resp => handleCorrectDeleteResp(personObject.name, resp))
+      .catch(err => console.log(err))
     const newPersons = persons.filter(person => person.id !== personObject.id);
     setPersons(newPersons);
   }
