@@ -99,7 +99,8 @@ app.put("/api/persons/:id", (request, response, next) => {
     "number": request.body.number
   })
   //Takes 2 args, 1. the ID, and 2 is the attributes you want to modify
-  Person.findByIdAndUpdate(request.params.id, {number: request.body.number})
+  //with runValidators: true now it needs to conform to the mongoose requeriments, handled through the frontend
+  Person.findByIdAndUpdate(request.params.id, {number: request.body.number}, { runValidators: true })
     .then(responseFromDB => {
       response.json(responseFromDB);
     })

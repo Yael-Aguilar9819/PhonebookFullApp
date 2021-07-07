@@ -57,7 +57,7 @@ const App = () => {
       newObjectPerson.id = persons[indexOfName].id;
       modifyPersonInfoInServerAndFront(newObjectPerson, indexOfName, persons);
     } else {
-      //now is an async function - refactored
+      //now is an async function that does everything - refactored
       handleCorrectPOSTResponse(newObjectPerson)
         .then(resp => console.log(resp))
         .catch(error => {
@@ -93,14 +93,29 @@ const App = () => {
     
     //this now connects to the backend-service
     personsInfoService.modifyPersonInfo(newObjectPerson)
-      .then(resp => console.log(resp))
+      .then(resp => {
+        handlePUTRequestMessageToUser(newObjectPerson, resp).then(processed => {
+          if (processed) setPersons(newPersonsArray)} //if the promise return true, the modification in the front
+                                                      //will be valid, otherwise is omitted
+        )
+      })
       .catch(err => {
         console.log(err)
         showMessageForXSeconds(`The person couldn't be updated, try again in a few minutes.`, 5, "negative")
       })
-    setPersons(newPersonsArray)
   }
 
+  const handlePUTRequestMessageToUser = async (personObject, serverPromise) => {
+    const bodyResp = await serverPromise.json();
+    console.log(bodyResp);
+    if (serverPromise.ok) { //.ok means that the server gae a 200-299 return status
+      showMessageForXSeconds(`${personObject.name} number changed to ${personObject.number} `, 5, "positive")
+      return true;
+    }
+    showMessageForXSeconds(`${bodyResp.error}`, 5, "negative");
+    return false;
+
+  }
   //This functions controls the component and the info that goes inside
   //Meaning its about if its neagtive or positive, trying to find a better name
   const showMessageForXSeconds = (messageToShow, numberOfSeconds, meaning) => {

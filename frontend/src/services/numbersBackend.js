@@ -26,7 +26,7 @@ const getAll = async () => {
 
 
 //The simple POST method using async, restructured to make it easier to use
-const sendNewPersonInfo = async (personInfoObject) => {
+const sendNewPersonInfo = async personInfoObject => {
     const responseFromServer = await methodToBackendJsonResponse(baseUrl, "POST", personInfoObject);
     return responseFromServer;
 }
@@ -39,7 +39,7 @@ const deletePerson = async personID => {
 
 const modifyPersonInfo = async personObject => {
     const responseFromServer = await methodToBackendJsonResponse(`${baseUrl}/${personObject.id}`, "PUT", personObject);  
-    return responseFromServer.json();
+    return responseFromServer;
 }
 
 //Cleaner with object initializer ES2015
