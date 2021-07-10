@@ -31,8 +31,8 @@ const Person = mongoose.model('Person', personSchema);
 // this is the route if the only arg it's the pass
 // it prints an index of all of the persons in the phonebook
 if (lengthOfArgs === 3) {
-  Person.find({}).then((result) => {
-    result.forEach((person) => {
+  Person.find({}).then(result => {
+    result.forEach(person => {
       console.log(person);
     });
     // Then we close the connection to the DB
@@ -49,7 +49,7 @@ if (lengthOfArgs === 3) {
   });
 
   // This reports to the console and close the connection
-  person.save().then((result) => {
+  person.save().then(result => {
     console.log(`added ${personName} number ${personNumber} to phonebook`);
     mongoose.connection.close();
   });
