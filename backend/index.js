@@ -70,9 +70,10 @@ app.get('/info', (request, response) => {
 
 // This creates a new object
 app.post('/api/persons', (request, response, next) => {
+  console.log(request.body)
   // This immediately stops the function if its true
+  //the 2nd arg, array its only of obligatory parameters
   if (sendErrorResponseIfAnyAttributeNotFound(request.body, ['name', 'number'], response)) return 1;
-
   // Creates the new object person through the person.js model
   const newPerson = new Person({
     name: request.body.name,
@@ -81,9 +82,10 @@ app.post('/api/persons', (request, response, next) => {
 
   // now is an async operation, that responds with the object
   // or just throw an error
-  newPerson.save().then((savedPerson) => {
+  newPerson.save()
+    .then((savedPerson) => {
     response.json(savedPerson);
-  })
+    })
     .catch((err) => {
       next(err);
     });
@@ -122,13 +124,19 @@ app.delete('/api/persons/:id', (request, response, next) => {
 
 // if any of the attributes its not found, it's going to throw a bad response to the request
 const sendErrorResponseIfAnyAttributeNotFound = (mainObject, ListOfattributesToCheck, response) => {
-  ListOfattributesToCheck.map((attribute) => {
-    if (!mainObject[attribute]) {
-      return response.status(400).json({
-        error: `${attribute} missing`,
-      });
+  let errorString = "";
+  ListOfattributesToCheck.forEach(attribute => {
+    if (!mainObject[attribute]) { //This adds to the error string
+      errorString = errorString + `${attribute} missing `;
     }
-  });
+  }); 
+  // If the string detected an error, it's going to send a response
+  // Else, its going normally
+  if (errorString !== "") {
+    return response.status(400).json({
+      error: `${errorString}`.trim(),
+    });  
+  }
 };
 
 // Certain error, invoked with next() use this

@@ -38,10 +38,7 @@ if (lengthOfArgs === 3) {
     // Then we close the connection to the DB
     mongoose.connection.close();
   });
-}
-
-// otherwise, it will add a new person to the phonebook
-else {
+} else { // otherwise, it will add a new person to the phonebook
   const personName = process.argv[3];
   // this will choose between 4 and 5 args, to add the correct personNumber
   const personNumber = lengthOfArgs > 4 ? process.argv[4].toString() : '';
