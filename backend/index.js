@@ -1,4 +1,5 @@
 const express = require('express');
+
 const app = express();
 // middlewares
 // This lines invokes the json-parser from vanilla express
@@ -7,6 +8,7 @@ app.use(express.json());
 app.use(express.static('build'));
 // It's necesary to have cors for this app to work
 const cors = require('cors');
+
 app.use(cors());
 // This line uses the morgan library to create a custom middleware that logs to the console
 const morgan = require('morgan');
@@ -63,8 +65,7 @@ app.get('/info', (request, response) => {
 // This creates a new object
 app.post('/api/persons', (request, response, next) => {
   console.log(request.body);
-  // This immediately stops the function if its true
-  // the 2nd arg, array its only of obligatory parameters
+  // the 2nd arg, array its only of obligatory parameters that should appear
   if (sendErrorResponseIfAnyAttributeNotFound(request.body, ['name', 'number'], response)) return 1;
   // Creates the new object person through the person.js model
   const newPerson = new Person({
@@ -78,23 +79,16 @@ app.post('/api/persons', (request, response, next) => {
     .then(savedPerson => {
       response.json(savedPerson);
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 // this route will be the one that modifies a entry if given the correct ID
 // if its not, will throw an error through the handle
 app.put('/api/persons/:id', (request, response, next) => {
-  const personToReturn = new Person({
-    name: request.body.name,
-    number: request.body.number,
-  });
+  const { number } = request.body;
   // Takes 2 args, 1. the ID, and 2 is the attributes you want to modify
   // with runValidators: true now it needs to conform to the mongoose requeriments
-  // handled through the frontend
-  Person.findByIdAndUpdate(request.params.id, { number: request.body.number },
-    { runValidators: true })
+  Person.findByIdAndUpdate(request.params.id, { number }, { runValidators: true })
     .then(responseFromDB => {
       response.json(responseFromDB);
     })
@@ -138,7 +132,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' });
   // This validation errs are given by unique-validator package installed from npm
-  } else if (error.name === 'ValidationError') {
+  } if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   }
   next(error);
@@ -162,5 +156,5 @@ const getActualHourWithDate = () => {
 // with dotenv it's easy to modify the default port
 const { PORT } = process.env;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);  
+  console.log(`Server running on port ${PORT}`);
 });
