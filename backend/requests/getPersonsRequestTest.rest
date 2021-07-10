@@ -21,8 +21,6 @@ POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "number":"sd",
-    "sda": "sds"
 }
 
 ###
@@ -35,4 +33,4 @@ Content-Type: application/json
 }
 
 ###
-DELETE http://localhost:3001/api/persons/60e970a52761381d4cbde482
+DELETE http://localhost:3001/api/persons/60e9752948705c22a4c8e77f

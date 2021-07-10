@@ -1,21 +1,18 @@
 const express = require('express');
-
 const app = express();
-
 // middlewares
 // This lines invokes the json-parser from vanilla express
 app.use(express.json());
-
 // this makes express search in the /build folder for the static files
 app.use(express.static('build'));
-
 // It's necesary to have cors for this app to work
 const cors = require('cors');
-
 app.use(cors());
-
 // This line uses the morgan library to create a custom middleware that logs to the console
 const morgan = require('morgan');
+// This is the model that let use create and create Persons contact info
+const mongoose = require('mongoose');
+const Person = require('./models/person');
 
 const assignMessagePOST = (request, response, next) => {
   if (request.method === 'POST') {
@@ -31,10 +28,6 @@ morgan.token('messagePOSTReq', request => request.messagePOSTReq);
 
 app.use(assignMessagePOST);
 app.use(morgan(':method :url - :response-time ms :messagePOSTReq'));
-
-// This is the model that let use create and create Persons contact info
-const mongoose = require('mongoose');
-const Person = require('./models/person');
 
 // This is the default route api, it shouldn't be able to be seen, but still here
 app.get('/', (request, response) => {
@@ -53,7 +46,6 @@ app.get('/api/persons/:id', (request, response, next) => {
   // findById uses the ID and then returns it, if it fails goes to the errorhandler
   Person.findById(request.params.id).then(person => {
     // Added if else because if it's not fiund, it's going to return null
-    // else it means that it was found, and we proceed as usual
     if (person === null) response.status(404).end();
     else response.json(person);
   }).catch(err => {
@@ -127,14 +119,14 @@ const sendErrorResponseIfAnyAttributeNotFound = (mainObject, ListOfattributesToC
   let errorString = '';
   ListOfattributesToCheck.forEach(attribute => {
     if (!mainObject[attribute]) { // This adds to the error string
-      errorString += `${attribute} missing `;
+      errorString += `${attribute} missing`;
     }
   });
   // If the string detected an error, it's going to send a response
   // Else, its going normally
   if (errorString !== '') {
     return response.status(400).json({
-      error: `${errorString}`.trim(),
+      error: `${errorString}`,
     });
   }
 };
@@ -146,7 +138,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' });
   // This validation errs are given by unique-validator package installed from npm
-  } if (error.name === 'ValidationError') {
+  } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   }
   next(error);
@@ -160,18 +152,6 @@ const unknownEndpoint = (request, response) => {
 };
 app.use(unknownEndpoint);
 
-// const updateOrForcePersonCreation = async (newPersonObject) => {
-//   const responseFromMongoose = await Person.updateOne({ name: newPersonObject.name },
-//     { number: newPersonObject.number });
-
-//   // n is the number of entries that were modified
-//   if (responseFromMongoose.n === 1) { /// if it was found and modified
-//     return newPersonObject;
-//   } // if it wasn't found an object with this name
-//   const responseFromNewObject = await newPersonObject.save();
-//   return responseFromNewObject;
-// };
-
 // This just compose both functions and make them a full date
 const getActualHourWithDate = () => {
   const actualDate = new Date().toDateString();
@@ -182,5 +162,5 @@ const getActualHourWithDate = () => {
 // with dotenv it's easy to modify the default port
 const { PORT } = process.env;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);  
 });
