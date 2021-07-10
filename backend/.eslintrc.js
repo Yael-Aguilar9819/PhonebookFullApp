@@ -19,5 +19,16 @@ module.exports = {
     'react',
   ],
   rules: {
+    'no-underscore-dangle': 'off',
+    'no-param-reassign': 'off',
+    'no-console': 'off',
+    'no-use-before-define': [
+      'error', { functions: false, classes: false, variables: false },
+    ],
+    'consistent-return': 'off',
+    'linebreak-style': [
+      'error',
+      'windows',
+    ],
   },
 };
